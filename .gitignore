@@ -165,6 +165,9 @@ NLP/spam.csv
 NLP/news_cat.json
 NLP/students.txt
 NLP/combined.json
+NLP/True.csv
+NLP/Fake.csv
+NLP/ecommerceDataset.csv
 
 
 
