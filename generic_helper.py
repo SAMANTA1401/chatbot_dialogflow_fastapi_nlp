@@ -3,7 +3,7 @@ import re
 def extract_session_id(sesstion_str: str):
     
     match = re.search(r"/sessions/(.*?)/contexts/", sesstion_str)
-    if match:
+    if match: # if found
         extracted_string = match.group(1)
         return extracted_string
     return "something wrong"

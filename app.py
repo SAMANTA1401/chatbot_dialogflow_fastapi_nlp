@@ -4,16 +4,22 @@ from fastapi import Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
-import db_helper
-import generic_helper
+from CHATBOT2 import db_helper
+
+from CHATBOT2 import generic_helper
 
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
+
+# connect to dialog flow console
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+# Your web service will receive a POST request from Dialogflow in the form of the response to a 
+# user query matched by intents with webhook enabled.
 @app.post("/")
 async def handle_request(request: Request):
     # Retrieve the JSON data from the request
@@ -27,9 +33,10 @@ async def handle_request(request: Request):
 
     session_id = generic_helper.extract_session_id(output_contexts[0]['name'])
 
-
+    # intent_handler_dict: This dictionary maps Dialogflow intents (keys) to corresponding Python 
+    # functions (values) that handle those intents.
     intent_handeler_dict = {
-        'order.add - context:ongoing-order': add_to_order,
+        'order.add - context:ongoing-order': add_to_order, # call function
         'order.remove-context:ongoing-order' :remove_from_order,
         'order.complete-context:ongoing-order': complete_order,
         'track.order-context:ongoing-tracking' : track_order,
@@ -45,7 +52,7 @@ def add_to_order(parameters: dict, session_id: str):
     quantites = parameters["number"]
     
     if len(food_items) != len(quantites):
-        fullfillment_text = "sorry I din't understand , Can you please specify food items and quantities."
+        fullfillment_text = "sorry I din't understand , Can you please specify food items and quantities." # reply from agen
     else:
         new_food_dict = dict(zip(food_items, quantites))
 
@@ -60,7 +67,7 @@ def add_to_order(parameters: dict, session_id: str):
         print(inprogress_orders)
     
         order_str = generic_helper.get_str_from_food_dict(inprogress_orders[session_id])
-        fullfillment_text = f"So far you have: {order_str}. Do you need anything else?"
+        fullfillment_text = f"So far you have: {order_str}. Do you need anything else?" # reply from agent
 
     return JSONResponse(content={
             "fulfillmentText": fullfillment_text
@@ -143,3 +150,9 @@ def remove_from_order(parameters: dict, session_id: str):
     return JSONResponse(content={
         "fulfillmentText": fullfillment_text
     })
+    
+    
+    
+# add url to fullfillment of dialogflow local url(host) not supported must give a onlie url
+# local url can be bypassed by ngrok like https://7a4b-116-193-141-115.ngrok-free.app  
+# instead of http://0.0.0.0:8000
